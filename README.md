@@ -119,7 +119,6 @@ docker-compose run testrunner
 ## 📂 Project Structure
 
 ```
-├── coverage_test_data/      # Test coverage reports
 ├── docker/                  # Dockerfiles for services
 │   ├── producer/            # Producer service
 │   ├── consumer/            # Consumer service
