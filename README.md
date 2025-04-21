@@ -15,8 +15,6 @@ Analyze rolling month volatility and discover stocks with similar risk profiles 
 - [Testing](#testing)
 - [Project Structure](#project-structure)
 - [Production Deployment](#production-deployment)
-- [Contributing](#contributing)
-- [License](#license)
 
 ---
 
