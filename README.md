@@ -46,12 +46,6 @@ The Real-Time Stock Analyzer is built on a microservices architecture. Below is 
 
 ![Architectural Diagram](src/images/architecture.PNG)
 
----
-
-## 🏗️ Architecture
-
-The Real-Time Stock Analyzer is built on a microservices architecture. Below is an overview of the key components:
-
 ### Key Components:
 1. **Producer**: Fetches stock data from Yahoo Finance and streams it to Kafka.
 2. **Kafka**: Acts as the message broker for real-time data streaming.
