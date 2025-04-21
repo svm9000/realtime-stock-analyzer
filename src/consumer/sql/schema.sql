@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS stock_updates (
+    id SERIAL PRIMARY KEY,
+    symbol VARCHAR(10),
+    data JSONB,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

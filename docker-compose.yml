@@ -1,0 +1,138 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: real-time-dash-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
+    ports:
+      - "${ZOOKEEPER_CLIENT_PORT}:${ZOOKEEPER_CLIENT_PORT}"
+    networks:
+      - app_network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: real-time-dash-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
+      KAFKA_ZOOKEEPER_CONNECT: ${KAFKA_ZOOKEEPER_CONNECT}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS}
+      KAFKA_LISTENERS: ${KAFKA_LISTENERS}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+    ports:
+      - "${KAFKA_PORT}:${KAFKA_PORT}"
+    networks:
+      - app_network
+
+  producer:
+    build:
+      context: .
+      dockerfile: docker/producer/Dockerfile
+    container_name: real-time-dash-producer
+    depends_on:
+      - kafka
+    env_file:
+      - .env
+    networks:
+      - app_network
+    command: ["bash", "-c", "until nc -z $KAFKA_HOST $KAFKA_PORT; do sleep 2; done; python -m src.producer.stock_producer"]
+
+  consumer:
+    build:
+      context: .
+      dockerfile: docker/consumer/Dockerfile 
+    container_name: real-time-dash-consumer
+    depends_on:
+      - kafka
+    env_file:
+      - .env
+    networks:
+      - app_network
+    command: ["bash", "-c", "until nc -z $KAFKA_HOST $KAFKA_PORT; do sleep 2; done; python -m src.consumer.stock_consumer"]
+
+  redis:
+    image: redis:latest  # Use pre-built image unless custom config needed
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - app_network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    networks:
+      - app_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/dashboard/Dockerfile
+    container_name: real-time-dashboard
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    env_file:
+      - .env
+    networks:
+      - app_network
+    ports:
+      - "${DASHBOARD_PORT}:${DASHBOARD_PORT}"
+    command: ["streamlit", "run", "src/dashboard.py", "--server.port=${DASHBOARD_PORT}"]
+
+  testrunner:
+    build:
+      context: .
+      dockerfile: docker/tests/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - kafka
+      - postgres
+      - redis
+    networks:
+      - app_network
+
+    command: [
+      "sh", "-c",
+      "cd /app && \
+      pytest tests \
+      --cov=src \
+      --cov-report=xml:coverage/coverage.xml \
+      --cov-report=html:coverage/html \
+      -v --tb=long --showlocals \
+      && tail -f /dev/null"
+    ]
+
+
+    volumes:
+      - coverage_test_data:/app/coverage  # Persist coverage reports
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  coverage_test_data:
+      driver: local
+      driver_opts:
+        type: none
+        o: bind
+        device: D:/Documents/Work/TrainingCourse/Finance/Realtime_stock_analyzer/realtime-stock-analyzer/coverage_test_data
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: D:/Documents/Work/TrainingCourse/Finance/Realtime_stock_analyzer/realtime-stock-analyzer/postgress_data

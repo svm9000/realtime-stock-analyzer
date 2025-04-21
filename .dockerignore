@@ -1,0 +1,16 @@
+# Python cache and bytecode
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Coverage and test artifacts
+.coverage
+.coverage.*
+coverage_test_data/
+htmlcov/
+.pytest_cache/
+.cache
+*.cover
+coverage/

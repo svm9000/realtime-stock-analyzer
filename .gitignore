@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Coverage reports and test folders
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+coverage_test_data/
+.cache
+*.cover
+
+# Postgress_data volume
+postgress_data/
+
+# Other common Python test/coverage folders
+.tox/
+nosetests.xml
+coverage.xml
+.hypothesis/
