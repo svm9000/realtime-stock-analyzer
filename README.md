@@ -46,7 +46,7 @@ The Real-Time Stock Analyzer is built on a microservices architecture. Below is 
 
 ### Architectural Diagram
 
-![Architectural Diagram](src/images/architecture.png)
+![Architectural Diagram](src\images\architecture.png)
 
 ---
 
