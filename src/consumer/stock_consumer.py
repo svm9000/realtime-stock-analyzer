@@ -55,7 +55,7 @@ class KafkaMessageConsumer:
 
     def process_message(self, message: Dict[str, Any]) -> None:
         """
-        Process a single message. Maintain a rolling 100 messages in Redis and append all messages to PostgreSQL.
+        Process a single message. Maintain a rolling 1000 messages in Redis and append all messages to PostgreSQL.
         """
         self.logger.info(f"Received message: {message}")
 
